@@ -91,3 +91,50 @@ def do_add_clinic(request):
     else:
         print("ummmm")
         return redirect('/login?msg=method not allowed')
+
+def check_login_or_main(request):
+    if 'username' in request.session:
+        return redirect('/panel/')
+    else:
+        return redirect('/login/?msg=Please login')
+
+def login_page(request):
+    msg = request.GET.get('msg', "nope")
+    msg2 = msg.replace(" ","")
+    if(msg2.isalpha() is not True):
+        msg="nope"
+    if(msg == "nope"):
+        html = ""
+    else:
+        html = "<p>Message: "+str(msg)+"</p>"
+    html += """<html>   
+<body>
+<h3>Login</h3>
+<form action="/do_login/" method="post"/>
+<input placeholder="username" name="username"/><br>
+<input type="password" placeholder="password" name="password"/><br>
+<input type="submit"/>
+</form><br><br><br>
+<h3>Signup</h3>
+<form action="/do_signup/" method="post"/>
+<input placeholder="username" name="username"/><br>
+<input type="password" placeholder="password" name="password"/><br>
+<input type="email" placeholder="email" name="email"/><br>
+<input placeholder="name" name="name"/><br>
+<input placeholder="Role(monshi/patient)" name="role"/><br>
+<input placeholder="clinic_id(only if you are monshi)" name="clinic_id"/><br>
+<input type="submit"/>
+</form><br><br><br>
+<h3>Add Clinic</h3>
+<form action="/do_add_clinic/" method="post"/>
+<input placeholder="clinic_id" name="clinic_id"/><br>
+<input type="email" placeholder="email" name="email"/><br>
+<input placeholder="name" name="name"/><br>
+<input placeholder="Address" name="address"/><br>
+<input placeholder="phone number" name="phone_number"/><br>
+<input placeholder="services" name="services"/><br>
+<input type="submit"/>
+</form>
+</body>
+</html>"""
+    return HttpResponse(html)
