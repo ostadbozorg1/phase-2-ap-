@@ -110,33 +110,89 @@ def login_page(request):
     else:
         html = "<p>Message: "+str(msg)+"</p>"
     html += """<html>   
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    form {
+      max-width: 300px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+    }
+
+    input {
+      display: block;
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    input[type="submit"] {
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
 <body>
-<h3>Login</h3>
-<form action="/do_login/" method="post"/>
-<input placeholder="username" name="username"/><br>
-<input type="password" placeholder="password" name="password"/><br>
-<input type="submit"/>
-</form><br><br><br>
-<h3>Signup</h3>
-<form action="/do_signup/" method="post"/>
-<input placeholder="username" name="username"/><br>
-<input type="password" placeholder="password" name="password"/><br>
-<input type="email" placeholder="email" name="email"/><br>
-<input placeholder="name" name="name"/><br>
-<input placeholder="Role(monshi/patient)" name="role"/><br>
-<input placeholder="clinic_id(only if you are monshi)" name="clinic_id"/><br>
-<input type="submit"/>
-</form><br><br><br>
-<h3>Add Clinic</h3>
-<form action="/do_add_clinic/" method="post"/>
-<input placeholder="clinic_id" name="clinic_id"/><br>
-<input type="email" placeholder="email" name="email"/><br>
-<input placeholder="name" name="name"/><br>
-<input placeholder="Address" name="address"/><br>
-<input placeholder="phone number" name="phone_number"/><br>
-<input placeholder="services" name="services"/><br>
-<input type="submit"/>
-</form>
+  <form action="/do_login/" method="post">
+    <h3>Login</h3>
+    <input type="text" placeholder="Username" name="username">
+    <input type="password" placeholder="Password" name="password">
+    <input type="submit" value="Login">
+  </form>
+
+<form action="/do_signup/" method="post">
+    <h3>Signup</h3>
+    <input type="text" placeholder="Username" name="username">
+    <input type="password" placeholder="Password" name="password">
+    <input type="email" placeholder="Email" name="email">
+    <input type="text" placeholder="Name" name="name">
+     
+
+    
+     
+    <input type="text" placeholder="Clinic ID (only if you are monshi)" name="clinic_id">
+
+    <input type="radio" id="monshi" name="role" value="monshi">
+    <label for="monshi">Monshi</label>
+     
+    <input type="radio" id="patient" name="role" value="patient">
+    <label for="patient">Patient</label>
+    <input type="submit" value="Signup">
+     
+  </form>
+
+  <form action="/do_add_clinic/" method="post">
+    <h3>Add Clinic</h3>
+    <input type="text" placeholder="Clinic ID" name="clinic_id">
+    <input type="email" placeholder="Email" name="email">
+    <input type="text" placeholder="Name" name="name">
+    <input type="text" placeholder="Address" name="address">
+    <input type="text" placeholder="Phone Number" name="phone_number">
+    <input type="text" placeholder="Services" name="services">
+    <input type="submit" value="Add Clinic">
+  </form>
 </body>
 </html>"""
     return HttpResponse(html)
