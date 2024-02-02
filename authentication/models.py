@@ -23,6 +23,3 @@ class Appointment(models.Model):
     user_id = models.CharField(max_length=255)
     date = models.DateField(max_length=255)
     status = models.CharField(max_length=20)
-
-
-    

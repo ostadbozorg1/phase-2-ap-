@@ -8,4 +8,5 @@ urlpatterns = [
     path('do_signup/', views.do_signup, name='send_otp'),
     path('do_add_clinic/', views.do_add_clinic, name='send_otp'),
 
+    
 ]

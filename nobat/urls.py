@@ -14,5 +14,5 @@ urlpatterns = [
     path('confirmed_appointments/', views.confirmed_appointments, name='send_otp'),
     path('canceled_appointments/', views.canceled_appointments, name='send_otp'),
     path('passed_appointments/', views.passed_appointments, name='send_otp'),
-
+    
 ]

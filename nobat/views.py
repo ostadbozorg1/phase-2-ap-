@@ -7,20 +7,20 @@ from authentication.models import UserModel, ClinicModel, Appointment
 from datetime import datetime
 from datetime import date
 
-
 def panel(request):
     if 'username' not in request.session:
         return redirect('../login/')
     user = UserModel.objects.get(username=request.session['username'])
     msg = request.GET.get('msg', "nope")
-    msg2 = msg.replace(" ", "")
-    if (msg2.isalpha() is not True):
-        msg = "nope"
-    if (msg == "nope"):
+    msg2 = msg.replace(" ","")
+    if(msg2.isalpha() is not True):
+        msg="nope"
+    if(msg == "nope"):
         html = ""
     else:
-        html = "<p>Message: " + str(msg) + "</p>"
-    if (user.role == "patient"):
+        html = "<p>Message: "+str(msg)+"</p>"
+    if(user.role == "patient"):
+        
         html += """<html>   
     <body>
     <h1>Panel</h1><br>
@@ -30,7 +30,7 @@ def panel(request):
     <a href="/panel/logout"><button>Logout</button></a>
     </body>
     </html>"""
-    if (user.role == "monshi"):
+    if(user.role == "monshi"):
         html = """<html>   
     <body>
     <h1>Panel</h1><br>
@@ -39,7 +39,7 @@ def panel(request):
     <a href="/panel/confirmed_appointments"><button>Confirmed appointments</button></a><br><br>
         <a href="/panel/canceled_appointments"><button>Canceled appointments</button></a><br><br>
     <a href="/panel/passed_appointments"><button>Passed appointments</button></a><br><br>
-
+    
     <a href="/panel/logout"><button>Logout</button></a>
     </body>
     </html>"""
@@ -50,9 +50,9 @@ def new_appointment(request):
     if 'username' not in request.session:
         return redirect('../login/?msg=Please login')
     user = UserModel.objects.get(username=request.session['username'])
-    if (user.role != "patient"):
+    if(user.role != "patient"):
         return redirect('../panel/?msg=Access Denied')
-
+    
     html = """<html>   
 <body>
 <h1>Make New Appointment</h1>
@@ -65,47 +65,45 @@ def new_appointment(request):
 </html>"""
     return HttpResponse(html)
 
-
 def make_new_appointment(request):
     if 'username' not in request.session:
         return redirect('../login/?msg=Please login')
     user = UserModel.objects.get(username=request.session['username'])
-    if (user.role != "patient"):
+    if(user.role != "patient"):
         return redirect('../panel/?msg=Access Denied')
     if request.method == 'POST':
         clinic_id = request.POST['clinic_id']
         date_string = request.POST['date']
-
+        
         try:
             clinic = ClinicModel.objects.get(clinic_id=clinic_id)
         except:
             return redirect('../panel/?msg=Wrong clinic id')
-
+        
         try:
             date = datetime.strptime(date_string, '%Y-%m-%d').date()
         except:
             return redirect('../panel/?msg=wrong date format')
-
+        
         appointment = Appointment(clinic_id=clinic_id, date=date, user_id=request.session['username'], status="pending")
         appointment.save()
         return redirect('../my_appointments/?msg=Success')
-
-
+    
 def my_appointments(request):
     msg = request.GET.get('msg', "nope")
-    msg2 = msg.replace(" ", "")
-    if (msg2.isalpha() is not True):
-        msg = "nope"
-    if (msg == "nope"):
+    msg2 = msg.replace(" ","")
+    if(msg2.isalpha() is not True):
+        msg="nope"
+    if(msg == "nope"):
         html = ""
     else:
-        html = "<p>Message: " + str(msg) + "</p>"
+        html = "<p>Message: "+str(msg)+"</p>"
     if 'username' not in request.session:
         return redirect('../../login/?msg=Please login')
     user = UserModel.objects.get(username=request.session['username'])
-    if (user.role != "patient"):
+    if(user.role != "patient"):
         return redirect('../panel/?msg=Access Denied')
-
+    
     Appointments = Appointment.objects.filter(user_id=request.session['username'])
     html += '<table><tr><th>Date</th><th>Clinic ID</th><th>Status</th><th>Actions</th></tr>'
 
@@ -117,47 +115,44 @@ def my_appointments(request):
     html += '</table><br><br><a href="../../panel">Return to panel</a>'
 
     return HttpResponse(html)
-
+    
 
 def cancel_appointment(request):
     if 'username' not in request.session:
         return redirect('../my_appointments/?msg=Please login')
     appoint_id = request.GET.get('id', "nope")
-    if appoint_id == "nope":
+    if appoint_id == "nope" :
         return redirect('../login/?msg=Haaaaa')
     try:
         appoint = Appointment.objects.get(id=appoint_id)
     except:
         return redirect('../my_appointments/?msg=Wrong appointment id')
     user = UserModel.objects.get(username=request.session['username'])
-    if (appoint.user_id != user.username):
-        if (user.role != "monshi" or user.clinic_id != appoint.clinic_id):
+    if(appoint.user_id != user.username):
+        if(user.role != "monshi" or user.clinic_id != appoint.clinic_id):
             return redirect('../my_appointments/')
     appoint.status = "canceled"
     appoint.save()
-    if (user.role == "patient"):
+    if(user.role == "patient"):
         return redirect('../my_appointments/')
     return redirect('../pending_appointments/')
-
 
 def approve_appointment(request):
     if 'username' not in request.session:
         return redirect('../my_appointments/?msg=Please login')
     appoint_id = request.GET.get('id', "nope")
-    if appoint_id == "nope":
+    if appoint_id == "nope" :
         return redirect('../login/?msg=Haaaaaaaaaa')
     try:
         appoint = Appointment.objects.get(id=appoint_id)
     except:
         return redirect('../my_appointments/?msg=Wrong id')
     user = UserModel.objects.get(username=request.session['username'])
-    if (user.role != "monshi" or user.clinic_id != appoint.clinic_id):
+    if(user.role != "monshi" or user.clinic_id != appoint.clinic_id):
         return redirect('../panel/?msg=Access Denied')
     appoint.status = "approved"
     appoint.save()
     return redirect('../pending_appointments/?msg=Success')
-
-
 def list_clinics(request):
     Clinics = ClinicModel.objects.all()
     html = '<h1>List of Clinics</h1><br><table><tr><th>Name</th><th>Clinic ID</th><th>Email</th><th>Address</th><th>Phone Number</th><th>Services</th></tr>'
@@ -181,18 +176,18 @@ def pending_appointments(request):
     if 'username' not in request.session:
         return redirect('../../login/?msg=Please login')
     user = UserModel.objects.get(username=request.session['username'])
-    if (user.role != "monshi"):
+    if(user.role != "monshi"):
         return redirect('../panel/?msg=Access Denied')
     msg = request.GET.get('msg', "nope")
-    msg2 = msg.replace(" ", "")
-    if (msg2.isalpha() is not True):
-        msg = "nope"
-    if (msg == "nope"):
+    msg2 = msg.replace(" ","")
+    if(msg2.isalpha() is not True):
+        msg="nope"
+    if(msg == "nope"):
         html = ""
     else:
-        html = "<p>Message: " + str(msg) + "</p>"
+        html = "<p>Message: "+str(msg)+"</p>"
     today = date.today()
-    Appointments = Appointment.objects.filter(clinic_id=user.clinic_id, status="pending", date__gte=today)
+    Appointments = Appointment.objects.filter(clinic_id=user.clinic_id,status="pending",date__gte=today)
     html += '<table><tr><th>Date</th><th>Clinic ID</th><th>User ID</th><th>Status</th><th>Actions</th></tr>'
 
     # Add a row for each appointment
@@ -204,23 +199,22 @@ def pending_appointments(request):
 
     return HttpResponse(html)
 
-
 def confirmed_appointments(request):
     if 'username' not in request.session:
         return redirect('../../login/')
     user = UserModel.objects.get(username=request.session['username'])
     msg = request.GET.get('msg', "nope")
-    msg2 = msg.replace(" ", "")
-    if (msg2.isalpha() is not True):
-        msg = "nope"
-    if (msg == "nope"):
+    msg2 = msg.replace(" ","")
+    if(msg2.isalpha() is not True):
+        msg="nope"
+    if(msg == "nope"):
         html = ""
     else:
-        html = "<p>Message: " + str(msg) + "</p>"
-    if (user.role != "monshi"):
+        html = "<p>Message: "+str(msg)+"</p>"
+    if(user.role != "monshi"):
         return redirect('../panel/')
     today = date.today()
-    Appointments = Appointment.objects.filter(clinic_id=user.clinic_id, status="approved", date__gte=today)
+    Appointments = Appointment.objects.filter(clinic_id=user.clinic_id,status="approved",date__gte=today)
     html += '<table><tr><th>Date</th><th>Clinic ID</th><th>User ID</th><th>Status</th><th>Actions</th></tr>'
 
     # Add a row for each appointment
@@ -232,23 +226,22 @@ def confirmed_appointments(request):
 
     return HttpResponse(html)
 
-
 def canceled_appointments(request):
     if 'username' not in request.session:
         return redirect('../../login/')
     user = UserModel.objects.get(username=request.session['username'])
-    if (user.role != "monshi"):
+    if(user.role != "monshi"):
         return redirect('../panel/')
     today = date.today()
     msg = request.GET.get('msg', "nope")
-    msg2 = msg.replace(" ", "")
-    if (msg2.isalpha() is not True):
-        msg = "nope"
-    if (msg == "nope"):
+    msg2 = msg.replace(" ","")
+    if(msg2.isalpha() is not True):
+        msg="nope"
+    if(msg == "nope"):
         html = ""
     else:
-        html = "<p>Message: " + str(msg) + "</p>"
-    Appointments = Appointment.objects.filter(clinic_id=user.clinic_id, status="canceled", date__gte=today)
+        html = "<p>Message: "+str(msg)+"</p>"
+    Appointments = Appointment.objects.filter(clinic_id=user.clinic_id,status="canceled",date__gte=today)
     html += '<table><tr><th>Date</th><th>Clinic ID</th><th>User ID</th><th>Status</th><th>Actions</th></tr>'
 
     # Add a row for each appointment
@@ -259,24 +252,22 @@ def canceled_appointments(request):
     html += '</table><br><br><a href="../../panel">Return to panel</a>'
 
     return HttpResponse(html)
-
-
 def passed_appointments(request):
     if 'username' not in request.session:
         return redirect('../../login/')
     user = UserModel.objects.get(username=request.session['username'])
-    if (user.role != "monshi"):
+    if(user.role != "monshi"):
         return redirect('../panel/')
     today = date.today()
     msg = request.GET.get('msg', "nope")
-    msg2 = msg.replace(" ", "")
-    if (msg2.isalpha() is not True):
-        msg = "nope"
-    if (msg == "nope"):
+    msg2 = msg.replace(" ","")
+    if(msg2.isalpha() is not True):
+        msg="nope"
+    if(msg == "nope"):
         html = ""
     else:
-        html = "<p>Message: " + str(msg) + "</p>"
-    Appointments = Appointment.objects.filter(clinic_id=user.clinic_id, date__lt=today)
+        html = "<p>Message: "+str(msg)+"</p>"
+    Appointments = Appointment.objects.filter(clinic_id=user.clinic_id,date__lt=today)
     html += '<table><tr><th>Date</th><th>Clinic ID</th><th>User ID</th><th>Final Status</th></tr>'
 
     # Add a row for each appointment

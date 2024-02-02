@@ -5,6 +5,7 @@ from django.contrib import messages
 from .models import UserModel,ClinicModel
 
 
+
 def do_login(request):
     print("man zendam")
     if request.method == 'POST':
@@ -23,9 +24,8 @@ def do_login(request):
         else:
             return redirect('/login?msg=Wrong username or password')
     else:
-        print("umm")
+        print("ummmm")
         return redirect('/login?msg=Method not allowed')
-
 
 def do_signup(request):
     print("man zendam")
@@ -65,6 +65,8 @@ def do_signup(request):
     else:
         print("ummmm")
         return redirect('/login?msg=Method not allowed')
+
+
 
 def do_add_clinic(request):
     print("man zendam")
